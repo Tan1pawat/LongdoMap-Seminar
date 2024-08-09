@@ -1,0 +1,64 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Create Map Sample | Longdo Map</title>
+  <style type="text/css">
+    html {
+      height: 100%;
+    }
+
+    body {
+      margin: 0px;
+      height: 100%;
+    }
+
+    #map {
+      height: 50%;
+    }
+
+    #result {
+      height: 50%
+    }
+  </style>
+  <script type="text/javascript" src="https://api.longdo.com/map3/?key=seminar2024"></script>
+
+  <script>
+    var map
+    var Marker = new longdo.Marker(
+      { lon: 100.538316, lat: 13.764953 },
+      { title: 'Victory monument', detail: 'I\'m here' }
+    );
+
+    function init() {
+
+      map = new longdo.Map({
+        placeholder: document.getElementById('map'),
+        location: {
+          lon: 100.5351375,
+          lat: 13.767734
+        },
+      });
+
+      map.Event.bind(longdo.EventName.Ready, function () {
+        map.Route.placeholder(document.getElementById('result'));
+        map.Route.add(Marker);
+        map.Route.add({ lon: 100, lat: 15 });
+        map.Route.search();
+      });
+
+      map.Event.bind(longdo.EventName.GuideComplete, function () {
+        console.log('complete')
+      });
+
+    }
+  </script>
+</head>
+
+<body onload="init();">
+  <div id="map"></div>
+  <div id="result"></div>
+</body>
+
+</html>

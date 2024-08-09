@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://api.longdo.com/map3/?key=seminar2024"></script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <title>Thai Address Search | Longdo Map</title>
+    <style>
+        @font-face {
+            font-family: sukhumvit;
+            src: url('./fonts/sukhumvit-medium.ttf');
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+            font-family: sukhumvit;
+            color: #141617;
+            min-width: 320px;
+            overflow: hidden;
+        }
+
+        #header {
+            margin: 0px;
+            color: #000096;
+            width: 100%;
+            padding: 10px 30px;
+            border-bottom: 3px solid #000096;
+            box-sizing: border-box;
+            background-color: rgba(249, 249, 251, 0.43);
+            background-image: url('./pattern.png');
+            background-repeat: repeat;
+            background-blend-mode: overlay;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        #title {
+            font-size: 48px;
+            font-weight: bold;
+            margin-right: auto;
+            margin-bottom: 0px;
+        }
+
+        #logo-ndid {
+            height: 54px;
+            margin-right: 30px;
+        }
+
+        #logo-longdo-map {
+            height: 60px;
+        }
+
+        #content {
+            display: flex;
+            flex-direction: row;
+            height: calc(100% - 87px);
+            width: 100%;
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+            flex: 1;
+        }
+
+        #search-group {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        #searchbox {
+            color: #141617;
+            margin-right: 10px;
+            flex: 1;
+        }
+
+        #select-group {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+
+        #select-group > label {
+            margin: 0px 10px 0px 0px;
+        }
+
+        #selectdataset {
+            width: 200px;
+            color: #141617;
+        }
+
+        #suggest-results {
+            width: calc(100% - 40px);
+            max-height: 400px;
+            overflow-y: auto;
+            position: absolute;
+            background: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            z-index: 1000;
+            top: 60px;
+        }
+
+        .suggest-result-item,
+        .suggest-result-item:hover {
+            color: #141617;
+            cursor: pointer;
+        }
+
+        #search-container {
+            flex: 1;
+            padding: 20px;
+            position: relative;
+        }
+
+        #search-results {
+            margin-top: 30px;
+            height: calc(100% - 38px);
+            overflow-y: auto;
+        }
+
+        .search-result-item {
+            margin-bottom: 30px;
+        }
+
+        .search-result-item > h5 {
+            color: #000096;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .badge-info {
+            background-color: #f28010;
+        }
+
+        .address-detail {
+            font-size: 14px;
+        }
+
+        .address-detail {
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            background-color: rgba(0, 0, 150, 0.05);
+            background-image: url('./pattern.png');
+            background-repeat: repeat;
+            background-blend-mode: overlay;
+        }
+
+        .column {
+            width: 48%;
+        }
+
+        .address-detail div {
+            margin: 2px 0;
+            padding: 2px 0;
+            line-height: 1.5;
+        }
+        .address-detail > div > div {
+            text-wrap: nowrap;
+            height: 26px;
+        }
+
+        .address-detail div span {
+            font-weight: bold;
+        }
+
+        .address-detail > div > div > input {
+            width: calc(100% - 15px);
+            background-color: white;
+            border: 1px solid #f0efff;
+            border-radius: 3px;
+            height: 100%;
+            color: #141617;
+        }
+
+        .snippet {
+            width: 280px;
+            height: 280px;
+            display: none;
+            margin: 0px auto;
+        }
+
+        #content .maplibregl-popup-content.mapboxgl-popup-content {
+            font-family: sukhumvit;
+            color: #141617;
+        }
+
+        #content .maplibregl-popup-content.mapboxgl-popup-content .ldmap-popup_title {
+            color: #000096;
+            font-weight: bold;
+        }
+
+        #content .maplibregl-popup-close-button.mapboxgl-popup-close-button {
+            color: #f28010;
+            font-size: 20px;
+        }
+
+        @media screen and (max-width: 992px) {
+            #title {
+                font-size: 36px;
+            }
+
+            #logo-ndid {
+                height: 42px;
+            }
+
+            #logo-longdo-map {
+                height: 42px;
+            }
+
+            #content {
+                height: calc(100% - 77px);
+            }
+
+            #searchbox {
+                width: 100%;
+                margin-right: 0px;
+                margin-bottom: 10px;
+                flex: none;
+            }
+
+            #search-results {
+                height: calc(100% - 86px);
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            #title {
+                font-size: 28px;
+            }
+
+            #logo-ndid {
+                height: 36px;
+            }
+
+            #logo-longdo-map {
+                height: 36px;
+            }
+
+            #content {
+                height: calc(100% - 65px);
+            }
+        }
+
+        @media screen and (max-width: 600px) {
+            #title {
+                font-size: 28px;
+                width: 100%;
+                text-align: center;
+            }
+
+            #logo-ndid {
+                height: 28px;
+            }
+
+            #logo-longdo-map {
+                height: 28px;
+            }
+
+            #content {
+                height: calc(100% - 93px);
+            }
+
+            #map {
+                display: none;
+            }
+
+            .snippet {
+                display: block;
+            }
+        }
+
+    </style>
+</head>
+
+<body onload="init();">
+    <div id="header">
+        <label id="title">Thai Address <span style="color: #f28010;">Search</span></label>
+        </div>
+    </div>
+    <div id="content">
+        <div id="search-container">
+            <div id="search-group">
+                <input type="search" id="searchbox" class="form-control" placeholder="กรุณาค้นหาที่อยู่ที่ต้องการ"
+                onkeyup="fetchSuggestions(event)"/>
+                <div id="select-group">
+                    <label>Dataset:</label>
+                    <select id="selectdataset" class="form-control">
+                        <option value="0">ทั้งหมด</option>
+                    </select>
+                </div>
+            </div>
+            <div id="suggest-results" class="list-group"></div>
+            <div id="search-results"></div>
+        </div>
+        <div id="map"></div>
+    </div>
+
+    <script>
+        var map;
+        var locList = [];
+        var dataset = {
+            suggest: ['poi_p,poi_c,poi2,'],
+            search: ['data2p,change,con']
+        }
+        function init() {
+            map = new longdo.Map({
+                placeholder: document.getElementById('map'),
+                layer: [longdo.Layers.NIGHT],
+            });
+        }
+
+        async function fetchSuggestions(event) {
+            const query = document.getElementById('searchbox').value;
+            if (query.length < 3) {
+                document.getElementById('search-results').innerHTML = '';
+                return;
+            }
+
+            if (event.key === "Enter") {
+                fetchMoreInformation(query);
+                return;
+            }
+
+            const apiUrl = `https://search.longdo.com/mapsearch/json/suggest?keyword=${encodeURIComponent(query)}&limit=10&key=seminar2024&dataset=${dataset.suggest[parseInt(document.getElementById('selectdataset').value)]}`;
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                displaySuggestions(data);
+            } catch (error) {
+                console.error('There has been a problem with your fetch operation:', error);
+            }
+        }
+
+        function displaySuggestions(data) {
+            const resultsContainer = document.getElementById('suggest-results');
+            resultsContainer.innerHTML = '';
+            if (data && data.data) {
+                data.data.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'suggest-result-item list-group-item list-group-item-action';
+                    div.innerHTML = item.d.replace('color:blue', 'color:#f28010');
+                    div.onclick = () => fetchMoreInformation(item.w);
+                    resultsContainer.appendChild(div);
+                });
+            }
+        }
+
+        async function fetchMoreInformation(suggestKeyword) {
+            document.getElementById('searchbox').value = suggestKeyword;
+            document.getElementById('suggest-results').innerHTML = '';
+            document.getElementById('search-results').innerHTML = '<h5 style="width: 100%; text-align: center;"><span style="color: #000069;">กำลังค้นหา</span><span style="color: #f28010;">...</span></h5>';
+
+            const apiUrl = `https://search.longdo.com/smartsearch/json/search?keyword=${encodeURIComponent(suggestKeyword)}&key=seminar2024&limit=50&extractaddress=1&dataset=${dataset.search[parseInt(document.getElementById('selectdataset').value)]}`;
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                displaySearchResults(data);
+            } catch (error) {
+                console.error('There has been a problem with your fetch operation:', error);
+            }
+        }
+
+        function displaySearchResults(data) {
+            map.Overlays.clear()
+            locList = []
+            const resultSearchContainer = document.getElementById('search-results');
+            resultSearchContainer.innerHTML = '';
+            if (data && data.data) {
+                if (data.data.length <= 0) {
+                    resultSearchContainer.innerHTML = '<h5 style="width: 100%; text-align: center;"><span style="color: #000069;">ไม่มีผลลัพธ์จาก</span><span style="color: #f28010;">การค้นหา</span></h5>';
+                    return;
+                }
+                data.data.forEach(item => {
+                    drawMarker(item);
+                    locList.push({ lat: item.lat, lon: item.lon });
+
+                    var address = `${item.extracted_address.house_no} `;
+                    if (item.extracted_address.moo) {
+                        address += `หมู่ที่ ${item.extracted_address.moo} `;
+                    }
+                    if (item.extracted_address.village) {
+                        address += `${item.extracted_address.village} `;
+                    }
+                    if (item.extracted_address.condo) {
+                        address += `${item.extracted_address.condo} `;
+                    }
+                    if (item.extracted_address.building) {
+                        address += `${item.extracted_address.building} `;
+                    }
+                    if (item.extracted_address.floor) {
+                        address += `ชั้น ${item.extracted_address.floor} `;
+                    }
+                    if (item.extracted_address.room) {
+                        address += `ห้อง ${item.extracted_address.room} `;
+                    }
+                    if (item.extracted_address.alley) {
+                        address += `${item.extracted_address.alley} `;
+                    }
+                    if (item.extracted_address.road) {
+                        address += `${item.extracted_address.road} `;
+                    }
+                    if (item.extracted_address.subdistrict) {
+                        address += `${item.extracted_address.subdistrict} `;
+                    }
+                    if (item.extracted_address.district) {
+                        address += `${item.extracted_address.district} `;
+                    }
+                    if (item.extracted_address.province) {
+                        address += `${item.extracted_address.province} `;
+                    }
+                    if (item.extracted_address.postcode) {
+                        address += `${item.extracted_address.postcode} `;
+                    }
+                    if (item.extracted_address.country) {
+                        address += `ประเทศ${item.extracted_address.country} `;
+                    }
+
+                    const div = document.createElement('div');
+                    div.className = 'search-result-item';
+                    div.innerHTML = `
+                        <h5 onclick="javascript:map.location({lat: ${item.lat}, lon: ${item.lon}})">${item.name} <span class="badge badge-info">${item.source === 'b9' ? 'B9' : item.source}</span></h5>
+                        <div class="address-detail row">
+                            <div class="column col-md-2 col-sm-4 col-xs-4 col-4">
+                                <div data-label="House No:">House No:</div>
+                                <div data-label="Moo:">Moo:</div>
+                                <div data-label="Village:">Village:</div>
+                                <div data-label="Condo:">Condo:</div>
+                                <div data-label="Building:">Building:</div>
+                                <div data-label="Floor:">Floor:</div>
+                                <div data-label="Room:">Room:</div>
+                            </div>
+                            <div class="column col-md-4 col-sm-8 col-xs-8 col-8">
+                                <div data-label="House No:"><input type="text" value="${item.extracted_address.house_no}" readonly></div>
+                                <div data-label="Moo:"><input type="text" value="${item.extracted_address.moo}" readonly></div>
+                                <div data-label="Village:"><input type="text" value="${item.extracted_address.village}" readonly></div>
+                                <div data-label="Condo:"><input type="text" value="${item.extracted_address.condo}" readonly></div>
+                                <div data-label="Building:"><input type="text" value="${item.extracted_address.building}" readonly></div>
+                                <div data-label="Floor:"><input type="text" value="${item.extracted_address.floor}" readonly></div>
+                                <div data-label="Room:"><input type="text" value="${item.extracted_address.room}" readonly></div>
+                            </div>
+                            <div class="column col-md-2 col-sm-4 col-xs-4 col-4">
+                                <div data-label="Alley:">Alley:</div>
+                                <div data-label="Road:">Road:</div>
+                                <div data-label="Subdistrict:">Subdistrict:</div>
+                                <div data-label="District:">District:</div>
+                                <div data-label="Province:">Province:</div>
+                                <div data-label="Postcode:">Postcode:</div>
+                                <div data-label="Country:">Country:</div>
+                            </div>
+                            <div class="column col-md-4 col-sm-8 col-xs-8 col-8">
+                                <div data-label="Alley:"><input type="text" value="${item.extracted_address.alley}" readonly></div>
+                                <div data-label="Road:"><input type="text" value="${item.extracted_address.road}" readonly></div>
+                                <div data-label="Subdistrict:"><input type="text" value="${item.extracted_address.subdistrict}" readonly></div>
+                                <div data-label="District:"><input type="text" value="${item.extracted_address.district}" readonly></div>
+                                <div data-label="Province:"><input type="text" value="${item.extracted_address.province}" readonly></div>
+                                <div data-label="Postcode:"><input type="text" value="${item.extracted_address.postcode}" readonly></div>
+                                <div data-label="Country:"><input type="text" value="${item.extracted_address.country}" readonly></div>
+                            </div>
+
+                            <div class="column col-md-2 col-sm-4 col-xs-4 col-4">
+                                <div data-label="Location:">Location:</div>
+                            </div>
+                            <div class="column col-md-10 col-sm-8 col-xs-8 col-8">
+                                <div data-label="Location:">
+                                    <input style="cursor: pointer;" type="text" value="${item.lat.toFixed(6)}, ${item.lon.toFixed(6)}" readonly onclick="javascript:map.location({lat: ${item.lat}, lon: ${item.lon}})">
+                                </div>
+                            </div>
+                            <div class="column col-12" style="text-align: center;">
+                                <img class="snippet" src="https://mmmap15.longdo.com/mmmap/snippet/?map=epsg3857&locale=th&height=280&width=280&HD=1&zoom=15&marker=position:${item.lat},${item.lon}">
+                            </div>
+                        </div>
+                    `;
+                    resultSearchContainer.appendChild(div);
+                });
+                map.bound(calculateBoundingBox(locList), {
+                    maxZoom: 17
+                });
+            }
+        }
+
+        function drawMarker(item) {
+            map.Overlays.add(new longdo.Marker({ lon: item.lon, lat: item.lat }, { title: `${item.lat.toFixed(6)}, ${item.lon.toFixed(6)}`, detail: item.name }));
+        }
+
+        function calculateBoundingBox(data) {
+            if (!data || data.length === 0) {
+                throw new Error("The data array is empty or undefined.");
+            }
+
+            let minLat = data[0].lat;
+            let maxLat = data[0].lat;
+            let minLon = data[0].lon;
+            let maxLon = data[0].lon;
+
+            for (let i = 1; i < data.length; i++) {
+                const point = data[i];
+                if (point.lat < minLat) minLat = point.lat;
+                if (point.lat > maxLat) maxLat = point.lat;
+                if (point.lon < minLon) minLon = point.lon;
+                if (point.lon > maxLon) maxLon = point.lon;
+            }
+
+            return {
+                minLat: minLat,
+                maxLat: maxLat,
+                minLon: minLon,
+                maxLon: maxLon
+            };
+        }
+
+    </script>
+</body>
+
+</html>

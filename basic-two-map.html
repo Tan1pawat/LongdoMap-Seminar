@@ -1,0 +1,59 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Create 2 Map Sample | Longdo Map</title>
+  <style type="text/css">
+    html {
+      height: 100%;
+    }
+
+    body {
+      margin: 0px;
+      height: 100%;
+    }
+
+    #map1 {
+      height: 50%;
+    }
+
+    #map2 {
+      height: 50%;
+    }
+  </style>
+  <script type="text/javascript" src="https://api.longdo.com/map3/?key=seminar2024"></script>
+  <script>
+    var map1, map2
+    function init() {
+      map1 = new longdo.Map({
+        placeholder: document.getElementById('map1'),
+        location: {
+          lon: 100.5351375,
+          lat: 13.767734
+        },
+      });
+
+      map2 = new longdo.Map({
+        placeholder: document.getElementById('map2'),
+        location: {
+          lon: 100.5351375,
+          lat: 13.767734
+        },
+      });
+
+      map1.Event.bind(longdo.EventName.Drag, function () {
+        var location = map1.location(); // Cross hair location
+        map2.location(location)
+        // console.log(location);
+      });
+    }
+  </script>
+</head>
+
+<body onload="init();">
+  <div id="map1"></div>
+  <div id="map2"></div>
+</body>
+
+</html>
